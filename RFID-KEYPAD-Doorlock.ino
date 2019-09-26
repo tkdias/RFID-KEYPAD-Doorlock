@@ -44,7 +44,23 @@ byte column_pins[columns] = {2, 1, 0};
 Keypad keypad_key = Keypad( makeKeymap(hexaKeys), row_pins, column_pins, rows, columns);
 
 void setup() {
+  
   // put your setup code here, to run once:
+  
+  // Arduino Pin configuration
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
+
+  sg90.attach(servoPin);  //Declare pin 8 for servo
+  sg90.write(0); // Set initial position at 90 degrees
+
+  lcd.begin();   // LCD screen
+  lcd.backlight();
+  SPI.begin();      // Init SPI bus
+  mfrc522.PCD_Init();   // Init MFRC522
+
+  lcd.clear(); // Clear LCD screen
 
 }
 
