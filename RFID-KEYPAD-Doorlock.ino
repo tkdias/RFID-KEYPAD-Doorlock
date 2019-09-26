@@ -66,5 +66,103 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  // System will first look for mode
+  if (RFIDMode == true) {
+    lcd.setCursor(0, 0);
+    lcd.print("   Door Lock");
+    lcd.setCursor(0, 1);
+    lcd.print(" Scan Your Tag ");
+
+    // Look for new cards
+    if ( ! mfrc522.PICC_IsNewCardPresent()) {
+      return;
+    }
+
+    // Select one of the cards
+    if ( ! mfrc522.PICC_ReadCardSerial()) {
+      return;
+    }
+
+    //Reading from the card
+    String tag = "";
+    for (byte j = 0; j < mfrc522.uid.size; j++)
+    {
+      tag.concat(String(mfrc522.uid.uidByte[j] < 0x10 ? " 0" : " "));
+      tag.concat(String(mfrc522.uid.uidByte[j], HEX));
+    }
+    tag.toUpperCase();
+
+    //Checking the card
+    if (tag.substring(1) == tagUID)
+    {
+      // If UID of tag is matched.
+      lcd.clear();
+      lcd.print("Tag Matched");
+      digitalWrite(greenLed, HIGH);
+      delay(3000);
+      digitalWrite(greenLed, LOW);
+
+      lcd.clear();
+      lcd.print("Enter Password:");
+      lcd.setCursor(0, 1);
+      RFIDMode = false; // Make RFID mode false
+    }
+
+    else
+    {
+      // If UID of tag is not matched.
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Wrong Tag Shown");
+      lcd.setCursor(0, 1);
+      lcd.print("Access Denied");
+      digitalWrite(buzzerPin, HIGH);
+      digitalWrite(redLed, HIGH);
+      delay(3000);
+      digitalWrite(buzzerPin, LOW);
+      digitalWrite(redLed, LOW);
+      lcd.clear();
+    }
+  }
+
+  // If RFID mode is false, it will look for keys from keypad
+  if (RFIDMode == false) {
+    key_pressed = keypad_key.getKey(); // Storing keys
+    if (key_pressed)
+    {
+      password[i++] = key_pressed; // Storing in password variable
+      lcd.print("*");
+    }
+    if (i == 4) // If 4 keys are completed
+    {
+      delay(200);
+      if (!(strncmp(password, initial_password, 4))) // If password is matched
+      {
+        lcd.clear();
+        lcd.print("Pass Accepted");
+        sg90.write(90); // Door Opened
+        digitalWrite(greenLed, HIGH);
+        delay(3000);
+        digitalWrite(greenLed, LOW);
+        sg90.write(0); // Door Closed
+        lcd.clear();
+        i = 0;
+        RFIDMode = true; // Make RFID mode true
+      }
+      else    // If password is not matched
+      {
+        lcd.clear();
+        lcd.print("Wrong Password");
+        digitalWrite(buzzerPin, HIGH);
+        digitalWrite(redLed, HIGH);
+        delay(3000);
+        digitalWrite(buzzerPin, LOW);
+        digitalWrite(redLed, LOW);
+        lcd.clear();
+        i = 0;
+        RFIDMode = true;  // Make RFID mode true
+      }
+    }
+  }
 
 }
