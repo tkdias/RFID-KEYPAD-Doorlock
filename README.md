@@ -39,3 +39,26 @@ In the end, connect the power source to the Arduino. I have used three 18650 cel
 
 ![alt text](https://github.com/tkdias/RFID-KEYPAD-Doorlock/blob/master/Image-0005.PNG)
 
+# Code Explanation
+The Code will store the initial password and UID of the tag. Change this UID with your tag’s UID. The door will only get open if this UID will match with the UID of the scanned tag. You can change the password to any numbers you want.
+
+In the loop function, it will first look for the mode of the system. If the RFID mode is true, then it will look for the RFID tags or if the RFID mode is false, it will look for the keys from keypad.
+
+While in RFID mode, if the user have scanned the right tag then the RFID mode will become false.
+
+If the user have scanned the wrong tag then it RFID mode will remain true and system will again look for RFID tags.
+
+If RFID mode is false, it will look for the keys from keypad. The keys pressed will be stored in array named ‘password’ and on getting 4 keys, it will match this password with the initial password. If the password will match, the door will open and RFID mode will become true.
+
+If the password won’t match then the door will remain closed and RFID mode will become true.
+
+
+# Libraries and Instructions
+RFID Library
+LiquidCrystal_I2C library
+
+The initial password is ‘1234’.
+
+Change the tag’s UID in the below line of code with your tag’s UID.
+
+String tagUID = “29 B9 ED 23”;
